@@ -1,46 +1,101 @@
-import { BaseAPI } from './base.js';
+import { BaseAPI } from "./base.js";
 
-/**
- * Container Management API
- */
 export class ContainerAPI extends BaseAPI {
-  /** List containers */
+  // List operations
   async list(): Promise<any> {
-    return this.post('/api/v2/containers/search', { page: 1, pageSize: 100 });
+    return this.post("/api/v2/containers/search", { page: 1, pageSize: 100, state: "all", orderBy: "name", order: "ascending" });
   }
 
-  /** Get container info */
-  async getInfo(id: string): Promise<any> {
-    return this.post('/api/v2/containers/info', { id });
+  async listSimple(): Promise<any> {
+    return this.post("/api/v2/containers/list", {});
   }
 
-  /** Create container */
-  async create(params: any): Promise<any> {
-    return this.post('/api/v2/containers', params);
+  async listByImage(image: string): Promise<any> {
+    return this.post("/api/v2/containers/list/byimage", { name: image });
   }
 
-  /** Start container */
+  // Info operations
+  async get(id: string): Promise<any> {
+    return this.post("/api/v2/containers/info", { id });
+  }
+
+  async inspect(id: string): Promise<any> {
+    return this.post("/api/v2/containers/inspect", { id });
+  }
+
+  async getStats(id: string): Promise<any> {
+    return this.get(`/api/v2/containers/stats/${id}`);
+  }
+
+  async getStatus(): Promise<any> {
+    return this.get("/api/v2/containers/status");
+  }
+
+  async getUsers(name: string): Promise<any> {
+    return this.post("/api/v2/containers/users", { name });
+  }
+
+  // Lifecycle operations
   async start(id: string): Promise<any> {
-    return this.post('/api/v2/containers/start', { id });
+    return this.post("/api/v2/containers/operate", { id, operation: "start" });
   }
 
-  /** Stop container */
   async stop(id: string): Promise<any> {
-    return this.post('/api/v2/containers/stop', { id });
+    return this.post("/api/v2/containers/operate", { id, operation: "stop" });
   }
 
-  /** Restart container */
   async restart(id: string): Promise<any> {
-    return this.post('/api/v2/containers/restart', { id });
+    return this.post("/api/v2/containers/operate", { id, operation: "restart" });
   }
 
-  /** Remove container */
+  async pause(id: string): Promise<any> {
+    return this.post("/api/v2/containers/operate", { id, operation: "pause" });
+  }
+
+  async unpause(id: string): Promise<any> {
+    return this.post("/api/v2/containers/operate", { id, operation: "unpause" });
+  }
+
+  async kill(id: string): Promise<any> {
+    return this.post("/api/v2/containers/operate", { id, operation: "kill" });
+  }
+
+  // Management operations
+  async create(config: any): Promise<any> {
+    return this.post("/api/v2/containers", config);
+  }
+
+  async update(id: string, config: any): Promise<any> {
+    return this.post("/api/v2/containers/update", { id, ...config });
+  }
+
+  async rename(id: string, name: string): Promise<any> {
+    return this.post("/api/v2/containers/rename", { id, name });
+  }
+
+  async upgrade(id: string, image: string): Promise<any> {
+    return this.post("/api/v2/containers/upgrade", { id, image });
+  }
+
   async remove(id: string): Promise<any> {
-    return this.post('/api/v2/containers/del', { id });
+    return this.post("/api/v2/containers/del", { id });
   }
 
-  /** Get container logs */
-  async getLogs(id: string, tail: number = 100): Promise<any> {
-    return this.post('/api/v2/containers/log', { id, tail });
+  async prune(): Promise<any> {
+    return this.post("/api/v2/containers/prune", {});
+  }
+
+  // Logs
+  async getLogs(id: string, tail = 100): Promise<any> {
+    return this.post("/api/v2/containers/log", { id, tail });
+  }
+
+  async cleanLog(id: string): Promise<any> {
+    return this.post("/api/v2/containers/clean/log", { id });
+  }
+
+  // Commit
+  async commit(id: string, repo: string, tag: string): Promise<any> {
+    return this.post("/api/v2/containers/commit", { id, repo, tag });
   }
 }

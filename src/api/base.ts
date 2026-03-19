@@ -1,56 +1,39 @@
-/**
- * 1Panel API Base Client
- */
-
-export interface OnePanelConfig {
-  host: string;
-  port: number;
-  apiKey: string;
-  protocol: 'http' | 'https';
-}
+import { OnePanelConfig } from "../types/config.js";
+import { generateToken } from "../utils/auth.js";
 
 export class BaseAPI {
   protected config: OnePanelConfig;
-  protected baseUrl: string;
 
   constructor(config: OnePanelConfig) {
-    this.config = config;
-    this.baseUrl = `${config.protocol}://${config.host}:${config.port}`;
+    this.config = { protocol: "http", ...config };
   }
 
-  protected async request(path: string, options: any = {}): Promise<any> {
-    const url = `${this.baseUrl}${path}`;
-    const headers: any = {
-      'Content-Type': 'application/json',
-      'Authorization': this.config.apiKey,
-      ...options.headers
-    };
+  protected async request(path: string, options: RequestInit = {}): Promise<any> {
+    const { token, timestamp } = generateToken(this.config.apiKey);
+    const url = `${this.config.protocol}://${this.config.host}:${this.config.port}${path}`;
 
-    const response = await fetch(url, { ...options, headers });
-    
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        "1Panel-Token": token,
+        "1Panel-Timestamp": timestamp,
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
+
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`HTTP ${response.status}: ${error}`);
+      throw new Error(`1Panel API error: ${response.status} ${response.statusText}`);
     }
 
-    const result = await response.json();
-    
-    if (result.code !== 200) {
-      throw new Error(`API Error ${result.code}: ${result.message}`);
-    }
-
-    return result.data;
+    return response.json();
   }
 
-  protected async get(path: string): Promise<any> {
-    return this.request(path, { method: 'GET' });
+  protected post(path: string, body: any): Promise<any> {
+    return this.request(path, { method: "POST", body: JSON.stringify(body) });
   }
 
-  protected async post(path: string, body?: any): Promise<any> {
-    const options: any = { method: 'POST' };
-    if (body !== undefined) {
-      options.body = JSON.stringify(body);
-    }
-    return this.request(path, options);
+  protected get(path: string): Promise<any> {
+    return this.request(path, { method: "GET" });
   }
 }

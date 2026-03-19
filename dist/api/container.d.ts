@@ -1,23 +1,27 @@
-import { BaseAPI } from './base.js';
-/**
- * Container Management API
- */
+import { BaseAPI } from "./base.js";
 export declare class ContainerAPI extends BaseAPI {
-    /** List containers */
     list(): Promise<any>;
-    /** Get container info */
-    getInfo(id: string): Promise<any>;
-    /** Create container */
-    create(params: any): Promise<any>;
-    /** Start container */
+    listSimple(): Promise<any>;
+    listByImage(image: string): Promise<any>;
+    get(id: string): Promise<any>;
+    inspect(id: string): Promise<any>;
+    getStats(id: string): Promise<any>;
+    getStatus(): Promise<any>;
+    getUsers(name: string): Promise<any>;
     start(id: string): Promise<any>;
-    /** Stop container */
     stop(id: string): Promise<any>;
-    /** Restart container */
     restart(id: string): Promise<any>;
-    /** Remove container */
+    pause(id: string): Promise<any>;
+    unpause(id: string): Promise<any>;
+    kill(id: string): Promise<any>;
+    create(config: any): Promise<any>;
+    update(id: string, config: any): Promise<any>;
+    rename(id: string, name: string): Promise<any>;
+    upgrade(id: string, image: string): Promise<any>;
     remove(id: string): Promise<any>;
-    /** Get container logs */
+    prune(): Promise<any>;
     getLogs(id: string, tail?: number): Promise<any>;
+    cleanLog(id: string): Promise<any>;
+    commit(id: string, repo: string, tag: string): Promise<any>;
 }
 //# sourceMappingURL=container.d.ts.map

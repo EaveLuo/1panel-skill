@@ -1,76 +1,227 @@
-import { BaseAPI } from './base.js';
+import { BaseAPI } from "./base.js";
 
 /**
  * Database Management API
+ * Supports MySQL, PostgreSQL, Redis
  */
 export class DatabaseAPI extends BaseAPI {
-  /** List databases by type */
-  async list(type: string): Promise<any> {
-    return this.post(`/api/v2/databases/${type}/search`, { page: 1, pageSize: 100 });
-  }
-
-  /** Create database */
-  async create(type: string, params: any): Promise<any> {
-    return this.post(`/api/v2/databases/${type}`, params);
-  }
-
-  /** Delete database */
-  async remove(type: string, id: number): Promise<any> {
-    return this.post(`/api/v2/databases/${type}/del`, { id });
-  }
-}
-
-/**
- * MySQL Database API
- */
-export class DatabaseMysqlAPI extends BaseAPI {
-  /** List MySQL databases */
-  async list(): Promise<any> {
-    return this.post('/api/v2/databases/search', { page: 1, pageSize: 100 });
-  }
+  // ==================== MySQL ====================
 
   /** Create MySQL database */
-  async create(params: any): Promise<any> {
-    return this.post('/api/v2/databases', params);
+  async createMysql(params: any): Promise<any> {
+    return this.post("/api/v2/databases", params);
   }
 
   /** Delete MySQL database */
-  async remove(id: number): Promise<any> {
-    return this.post('/api/v2/databases/del', { id });
+  async deleteMysql(params: any): Promise<any> {
+    return this.post("/api/v2/databases/del", params);
   }
 
-  /** Bind user */
-  async bindUser(params: any): Promise<any> {
-    return this.post('/api/v2/databases/bind', params);
+  /** Check before delete MySQL database */
+  async checkDeleteMysql(params: any): Promise<any> {
+    return this.post("/api/v2/databases/del/check", params);
   }
 
-  /** Change password */
-  async changePassword(params: any): Promise<any> {
-    return this.post('/api/v2/databases/change/password', params);
+  /** Search MySQL databases with pagination */
+  async searchMysql(params: any): Promise<any> {
+    return this.post("/api/v2/databases/search", params);
   }
 
-  /** Get status */
-  async getStatus(): Promise<any> {
-    return this.get('/api/v2/databases/status');
-  }
-}
-
-/**
- * Redis Database API
- */
-export class DatabaseRedisAPI extends BaseAPI {
-  /** Get Redis config */
-  async getConf(id: number): Promise<any> {
-    return this.post('/api/v2/databases/redis/conf', { id });
+  /** Bind user to MySQL database */
+  async bindMysqlUser(params: any): Promise<any> {
+    return this.post("/api/v2/databases/bind", params);
   }
 
-  /** Update Redis config */
-  async updateConf(id: number, content: string): Promise<any> {
-    return this.post('/api/v2/databases/redis/conf/update', { id, content });
+  /** Change MySQL access */
+  async changeMysqlAccess(params: any): Promise<any> {
+    return this.post("/api/v2/databases/change/access", params);
   }
 
-  /** Change password */
-  async changePassword(id: number, password: string): Promise<any> {
-    return this.post('/api/v2/databases/redis/password', { id, value: password });
+  /** Change MySQL password */
+  async changeMysqlPassword(params: any): Promise<any> {
+    return this.post("/api/v2/databases/change/password", params);
+  }
+
+  /** Update MySQL database description */
+  async updateMysqlDescription(params: any): Promise<any> {
+    return this.post("/api/v2/databases/description/update", params);
+  }
+
+  /** Load MySQL database from remote */
+  async loadMysqlFromRemote(params: any): Promise<any> {
+    return this.post("/api/v2/databases/load", params);
+  }
+
+  /** List MySQL database format collation options */
+  async listMysqlFormatOptions(): Promise<any> {
+    return this.post("/api/v2/databases/format/options", {});
+  }
+
+  /** Load MySQL remote access */
+  async loadMysqlRemoteAccess(params: any): Promise<any> {
+    return this.post("/api/v2/databases/remote", params);
+  }
+
+  /** Load MySQL status info */
+  async getMysqlStatus(): Promise<any> {
+    return this.post("/api/v2/databases/status", {});
+  }
+
+  /** Load MySQL variables info */
+  async getMysqlVariables(): Promise<any> {
+    return this.post("/api/v2/databases/variables", {});
+  }
+
+  /** Update MySQL variables */
+  async updateMysqlVariables(params: any): Promise<any> {
+    return this.post("/api/v2/databases/variables/update", params);
+  }
+
+  // ==================== Generic Database ====================
+
+  /** Create database */
+  async create(params: any): Promise<any> {
+    return this.post("/api/v2/databases/db", params);
+  }
+
+  /** Get databases by name */
+  async getByName(name: string): Promise<any> {
+    return this.request(`/api/v2/databases/db/${name}`, { method: "GET" });
+  }
+
+  /** Check database */
+  async check(params: any): Promise<any> {
+    return this.post("/api/v2/databases/db/check", params);
+  }
+
+  /** Delete database */
+  async remove(params: any): Promise<any> {
+    return this.post("/api/v2/databases/db/del", params);
+  }
+
+  /** Check before delete remote database */
+  async checkDeleteRemote(params: any): Promise<any> {
+    return this.post("/api/v2/databases/db/del/check", params);
+  }
+
+  /** List databases by type */
+  async listByType(type: string): Promise<any> {
+    return this.request(`/api/v2/databases/db/item/${type}`, { method: "GET" });
+  }
+
+  /** List databases */
+  async listAll(type: string): Promise<any> {
+    return this.request(`/api/v2/databases/db/list/${type}`, { method: "GET" });
+  }
+
+  /** Search databases with pagination */
+  async search(params: any): Promise<any> {
+    return this.post("/api/v2/databases/db/search", params);
+  }
+
+  /** Update database */
+  async update(params: any): Promise<any> {
+    return this.post("/api/v2/databases/db/update", params);
+  }
+
+  // ==================== Common Database ====================
+
+  /** Load base info */
+  async getCommonInfo(): Promise<any> {
+    return this.post("/api/v2/databases/common/info", {});
+  }
+
+  /** Load Database conf */
+  async loadConfigFile(): Promise<any> {
+    return this.post("/api/v2/databases/common/load/file", {});
+  }
+
+  /** Update conf by upload file */
+  async updateConfigByFile(params: any): Promise<any> {
+    return this.post("/api/v2/databases/common/update/conf", params);
+  }
+
+  // ==================== PostgreSQL ====================
+
+  /** Create PostgreSQL database */
+  async createPostgresql(params: any): Promise<any> {
+    return this.post("/api/v2/databases/pg", params);
+  }
+
+  /** Load PostgreSQL database from remote */
+  async loadPostgresqlFromRemote(database: string, params: any): Promise<any> {
+    return this.post(`/api/v2/databases/pg/${database}/load`, params);
+  }
+
+  /** Bind PostgreSQL user */
+  async bindPostgresqlUser(params: any): Promise<any> {
+    return this.post("/api/v2/databases/pg/bind", params);
+  }
+
+  /** Delete PostgreSQL database */
+  async deletePostgresql(params: any): Promise<any> {
+    return this.post("/api/v2/databases/pg/del", params);
+  }
+
+  /** Check before delete PostgreSQL database */
+  async checkDeletePostgresql(params: any): Promise<any> {
+    return this.post("/api/v2/databases/pg/del/check", params);
+  }
+
+  /** Update PostgreSQL database description */
+  async updatePostgresqlDescription(params: any): Promise<any> {
+    return this.post("/api/v2/databases/pg/description", params);
+  }
+
+  /** Change PostgreSQL password */
+  async changePostgresqlPassword(params: any): Promise<any> {
+    return this.post("/api/v2/databases/pg/password", params);
+  }
+
+  /** Change PostgreSQL privileges */
+  async changePostgresqlPrivileges(params: any): Promise<any> {
+    return this.post("/api/v2/databases/pg/privileges", params);
+  }
+
+  /** Search PostgreSQL databases with pagination */
+  async searchPostgresql(params: any): Promise<any> {
+    return this.post("/api/v2/databases/pg/search", params);
+  }
+
+  // ==================== Redis ====================
+
+  /** Load Redis conf */
+  async getRedisConf(params: any): Promise<any> {
+    return this.post("/api/v2/databases/redis/conf", params);
+  }
+
+  /** Update Redis conf */
+  async updateRedisConf(params: any): Promise<any> {
+    return this.post("/api/v2/databases/redis/conf/update", params);
+  }
+
+  /** Install redis-cli */
+  async installRedisCli(): Promise<any> {
+    return this.post("/api/v2/databases/redis/install/cli", {});
+  }
+
+  /** Change Redis password */
+  async changeRedisPassword(params: any): Promise<any> {
+    return this.post("/api/v2/databases/redis/password", params);
+  }
+
+  /** Load Redis persistence conf */
+  async getRedisPersistenceConf(): Promise<any> {
+    return this.post("/api/v2/databases/redis/persistence/conf", {});
+  }
+
+  /** Update Redis persistence conf */
+  async updateRedisPersistenceConf(params: any): Promise<any> {
+    return this.post("/api/v2/databases/redis/persistence/update", params);
+  }
+
+  /** Load Redis status info */
+  async getRedisStatus(): Promise<any> {
+    return this.post("/api/v2/databases/redis/status", {});
   }
 }
